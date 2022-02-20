@@ -15,8 +15,8 @@
 
 ### :point_down: How to use
 
-> **You could upload four files and preview them by clicking `Preview` Button**
+> **You could upload four files and preview them by clicking `Preview`**
 
-> **You could reset all uploaded files**
+> **You could reset all by clicking `Reset`**
 
-> **You could click `Execute` to run data preprocessing then have an overview picture and download by different level (Line/Order)**
+> **You could click `Execute` to run data preprocessing then have an overview picture and download by different level (Line/Order), besides, you could return to previous page by clicking `Home`**
