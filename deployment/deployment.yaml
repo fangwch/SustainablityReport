@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: st-report
+  namespace: st-report
+  labels:
+    app: st-report
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: st-report
+  template:
+    metadata:
+      labels:
+        app: st-report
+    spec:
+      volumes:
+        - name: streamlit-secret
+          secret:
+            secretName: streamlit-secret
+            defaultMode: 420
+      containers:
+        - name: st-report
+          image: icp.io/st-report:0.1-beta
+          ports:
+            - containerPort: 8501
+              protocol: TCP
+          resources:
+            requests:
+              cpu: '1'
+              memory: 512Mi
+          volumeMounts:
+            - name: streamlit-secret
+              mountPath: /app/.streamlit
+          imagePullPolicy: Always
+      restartPolicy: Always

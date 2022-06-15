@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: st-report
+  namespace: st-report
+  labels:
+    app: st-report
+spec:
+  ports:
+    - name: st-report
+      protocol: TCP
+      port: 8501
+      targetPort: 8501
+  selector:
+    app: st-report
+  type: ClusterIP
