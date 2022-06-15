@@ -1,0 +1,13 @@
+.git/
+.gradle/
+build/
+bin/
+scripts/
+deployment/
+
+.gitignore
+Dockerfile
+
+**/__pycache__
+.pyvenv
+test
