@@ -90,8 +90,6 @@ spec:
     #     - name: "only PRs"
     #       ref:
     #         name: "github"
-    #         kind: ClusterInterceptor
-    #         apiVersion: triggers.tekton.dev
     #       params:
     #         - name: "eventTypes"
     #           value: ["pull_request"]
