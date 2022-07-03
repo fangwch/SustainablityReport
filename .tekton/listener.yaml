@@ -43,6 +43,7 @@ spec:
                   ibm.io/auto-delete-bucket: "true"
                   ibm.io/bucket: ""
                   ibm.io/secret-name: cos-write-access
+                  ibm.io/secret-namespace: default
                   volume.beta.kubernetes.io/storage-class: ibmc-s3fs-standard-regional
                   volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
               spec:
