@@ -48,41 +48,41 @@ spec:
           value: $(params.registryNamespace)
         - name: registryRegion
           value: $(params.registryRegion)       
-    # - name: pipeline-validate-task
-    #   runAfter: [pipeline-build-task]
-    #   taskRef:
-    #     name: validate-task
-    #   workspaces:
-    #     - name: task-pvc
-    #       workspace: pipeline-pvc
-    #   params:
-    #     - name: repository
-    #       value: $(params.repository)
-    #     - name: revision
-    #       value: $(params.revision)
-    #     - name: apikey
-    #       value: $(params.apikey)
-    #     - name: defaultRegion
-    #       value: $(params.defaultRegion)
-    #     - name: registryRegion
-    #       value: $(params.registryRegion)            
-    # - name: pipeline-deploy-task
-    #   runAfter: [pipeline-validate-task]
-    #   taskRef:
-    #     name: deploy-task
-    #   workspaces:
-    #     - name: task-pvc
-    #       workspace: pipeline-pvc
-    #   params:
-    #     - name: repository
-    #       value: $(params.repository)
-    #     - name: revision
-    #       value: $(params.revision)
-    #     - name: apikey
-    #       value: $(params.apikey)
-    #     - name: cluster
-    #       value: $(params.cluster)
-    #     - name: clusterRegion
-    #       value: $(params.clusterRegion)
-    #     - name: clusterNamespace
-    #       value: $(params.clusterNamespace)  
+    - name: pipeline-validate-task
+      runAfter: [pipeline-build-task]
+      taskRef:
+        name: validate-task
+      workspaces:
+        - name: task-pvc
+          workspace: pipeline-pvc
+      params:
+        - name: repository
+          value: $(params.repository)
+        - name: revision
+          value: $(params.revision)
+        - name: apikey
+          value: $(params.apikey)
+        - name: defaultRegion
+          value: $(params.defaultRegion)
+        - name: registryRegion
+          value: $(params.registryRegion)            
+    - name: pipeline-deploy-task
+      runAfter: [pipeline-validate-task]
+      taskRef:
+        name: deploy-task
+      workspaces:
+        - name: task-pvc
+          workspace: pipeline-pvc
+      params:
+        - name: repository
+          value: $(params.repository)
+        - name: revision
+          value: $(params.revision)
+        - name: apikey
+          value: $(params.apikey)
+        - name: cluster
+          value: $(params.cluster)
+        - name: clusterRegion
+          value: $(params.clusterRegion)
+        - name: clusterNamespace
+          value: $(params.clusterNamespace)  
