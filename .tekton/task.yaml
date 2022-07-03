@@ -11,6 +11,8 @@ spec:
       default: master
     - name: apikey
       description: the ibmcloud api key
+    - name: defaultRegion
+      description: The IBM Cloud default region
     - name: api
       description: the ibmcloud api endpoint
       default: "https://cloud.ibm.com"
@@ -18,7 +20,7 @@ spec:
       description: the ibmcloud registry namespace
     - name: imageName
       description: the base image name
-      default: "hello-containers-tekton"
+      default: "sr-report"
     - name: registryRegion
       description: the ibmcloud registry region
   workspaces:
@@ -44,6 +46,8 @@ spec:
           value: $(params.apikey)
         - name: API
           value: $(params.api)
+        - name: DEFAULT_REGION
+          value: $(params.defaultRegion)
         - name: REGION
           value: $(params.registryRegion)
         - name: HOME
@@ -55,7 +59,7 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - set -e -o pipefail;
-          ibmcloud login -a $API;
+          ibmcloud login -a $API -r $DEFAULT_REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           cd /workspace && source scripts/pre-build-check.sh;
     # - name: build-docker-image
@@ -65,6 +69,8 @@ spec:
     #       value: $(params.apikey)
     #     - name: API
     #       value: $(params.api)
+    #     - name: DEFAULT_REGION
+    #       value: $(params.defaultRegion)
     #     - name: REGION
     #       value: $(params.registryRegion)
     #     - name: HOME
@@ -82,7 +88,7 @@ spec:
     #   command: ["/bin/bash", "-c"]
     #   args:
     #     - set -e -o pipefail;
-    #       ibmcloud login -a $API;
+    #       ibmcloud login -a $API -r $DEFAULT_REGION;
     #       export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
     #       cd /workspace;
     #       export GIT_COMMIT=$(git rev-parse HEAD);
@@ -148,6 +154,8 @@ spec:
       env:
         - name: IBMCLOUD_API_KEY
           value: $(params.apikey)
+        - name: DEFAULT_REGION
+          value: $(params.defaultRegion)
         - name: API
           value: $(params.api)
         - name: HOME
@@ -157,7 +165,7 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - set -e -o pipefail;
-          ibmcloud login -a $API;
+          ibmcloud login -a $API -r $DEFAULT_REGION;
           while read line; do export $line; done < /artifacts/build.properties;
           cp /artifacts/build.properties .;
           cd /workspace && source scripts/check-vulnerabilities.sh || true;
