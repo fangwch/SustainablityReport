@@ -50,7 +50,7 @@ spec:
                 storageClassName: "ibmc-s3fs-standard-regional"
                 resources:
                   requests:
-                    storage: 50Mb
+                    storage: 50M
         params:
           - name: repository
             value: $(params.repository)
