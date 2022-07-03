@@ -101,6 +101,8 @@ spec:
           params:
             - name: "filter"
               value: "body.action in ['opened', 'synchronize', 'reopened']"
+            - name: "filter"
+              value: "body.genericTriggerToken == \"edfab8afcab203030743c4d5786fd220b7cdadaa3e36117a\""
       binding:
         name: binding
       template:
