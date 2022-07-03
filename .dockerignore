@@ -10,4 +10,5 @@ Dockerfile
 
 **/__pycache__
 .pyvenv
+.pyenv
 test
