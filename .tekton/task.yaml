@@ -63,40 +63,40 @@ spec:
           ibmcloud cr region-set $REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           cd /workspace && source scripts/pre-build-check.sh;
-    # - name: build-docker-image
-    #   image: ibmcom/pipeline-base-image
-    #   env:
-    #     - name: IBMCLOUD_API_KEY
-    #       value: $(params.apikey)
-    #     - name: API
-    #       value: $(params.api)
-    #     - name: DEFAULT_REGION
-    #       value: $(params.defaultRegion)
-    #     - name: REGION
-    #       value: $(params.registryRegion)
-    #     - name: HOME
-    #       value: "/root"
-    #     - name: REGISTRY_NAMESPACE
-    #       value: $(params.registryNamespace)
-    #     - name: IMAGE_NAME
-    #       value: $(params.imageName)
-    #     - name: ARCHIVE_DIR
-    #       value: "/artifacts"
-    #     - name: BUILD_NUMBER
-    #       value: "0"
-    #     - name: GIT_BRANCH
-    #       value: $(params.revision)
-    #   command: ["/bin/bash", "-c"]
-    #   args:
-    #     - set -e -o pipefail;
-    #       ibmcloud login -a $API -r $DEFAULT_REGION;
-    #       ibmcloud cr region-set $REGION;
-    #       export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
-    #       cd /workspace;
-    #       export GIT_COMMIT=$(git rev-parse HEAD);
-    #       cd ..;
-    #       export REGISTRY_URL=$(ibmcloud cr info | grep -m1 -i '^Container Registry' | awk '{print $3;}');
-    #       cd /workspace && source scripts/build-docker-image.sh;
+    - name: build-docker-image
+      image: ibmcom/pipeline-base-image
+      env:
+        - name: IBMCLOUD_API_KEY
+          value: $(params.apikey)
+        - name: API
+          value: $(params.api)
+        - name: DEFAULT_REGION
+          value: $(params.defaultRegion)
+        - name: REGION
+          value: $(params.registryRegion)
+        - name: HOME
+          value: "/root"
+        - name: REGISTRY_NAMESPACE
+          value: $(params.registryNamespace)
+        - name: IMAGE_NAME
+          value: $(params.imageName)
+        - name: ARCHIVE_DIR
+          value: "/artifacts"
+        - name: BUILD_NUMBER
+          value: "0"
+        - name: GIT_BRANCH
+          value: $(params.revision)
+      command: ["/bin/bash", "-c"]
+      args:
+        - set -e -o pipefail;
+          ibmcloud login -a $API -r $DEFAULT_REGION;
+          ibmcloud cr region-set $REGION;
+          export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
+          cd /workspace;
+          export GIT_COMMIT=$(git rev-parse HEAD);
+          cd ..;
+          export REGISTRY_URL=$(ibmcloud cr info | grep -m1 -i '^Container Registry' | awk '{print $3;}');
+          cd /workspace && source scripts/build-docker-image.sh;
   sidecars:
     - image: moby/buildkit:v0.8.1
       name: server
