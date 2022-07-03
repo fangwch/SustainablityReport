@@ -25,7 +25,6 @@ spec:
       default: prod
   workspaces:
     - name: pipeline-pvc
-      emptyDir: {}
   tasks:
     - name: pipeline-build-task
       taskRef:
