@@ -128,6 +128,8 @@ spec:
       default: master
     - name: apikey
       description: the ibmcloud api key
+    - name: defaultRegion
+      description: The IBM Cloud default region
     - name: api
       description: the ibmcloud api endpoint
       default: "https://cloud.ibm.com"
