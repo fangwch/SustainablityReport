@@ -86,22 +86,22 @@ metadata:
   name: listener
 spec:
   triggers:
-    - interceptors:
-        # - name: "only PRs"
-        #   ref:
-        #     name: "github"
-        #     kind: ClusterInterceptor
-        #     apiVersion: triggers.tekton.dev
-        #   params:
-        #     - name: "eventTypes"
-        #       value: ["pull_request"]
-        - name: "only when PRs are opened"
-          ref:
-            name: "cel"
-          params:
-            - name: "filter"
-              value: "body.action in ['opened', 'synchronize', 'reopened']"
-      binding:
+    # - interceptors:
+    #     - name: "only PRs"
+    #       ref:
+    #         name: "github"
+    #         kind: ClusterInterceptor
+    #         apiVersion: triggers.tekton.dev
+    #       params:
+    #         - name: "eventTypes"
+    #           value: ["pull_request"]
+    #     - name: "only when PRs are opened"
+    #       ref:
+    #         name: "cel"
+    #       params:
+    #         - name: "filter"
+    #           value: "body.action in ['opened', 'synchronize', 'reopened']"
+    - binding:
         name: binding
       template:
         name: template
