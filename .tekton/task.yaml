@@ -60,6 +60,7 @@ spec:
       args:
         - set -e -o pipefail;
           ibmcloud login -a $API -r $DEFAULT_REGION;
+          ibmcloud cr region-set $REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
           cd /workspace && source scripts/pre-build-check.sh;
     # - name: build-docker-image
@@ -89,6 +90,7 @@ spec:
     #   args:
     #     - set -e -o pipefail;
     #       ibmcloud login -a $API -r $DEFAULT_REGION;
+    #       ibmcloud cr region-set $REGION;
     #       export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
     #       cd /workspace;
     #       export GIT_COMMIT=$(git rev-parse HEAD);
@@ -168,6 +170,7 @@ spec:
       args:
         - set -e -o pipefail;
           ibmcloud login -a $API -r $DEFAULT_REGION;
+          ibmcloud cr region-set $REGION;
           while read line; do export $line; done < /artifacts/build.properties;
           cp /artifacts/build.properties .;
           cd /workspace && source scripts/check-vulnerabilities.sh || true;

@@ -74,7 +74,6 @@ else
 fi
 
 echo "Logging into regional IBM Container Registry"
-ibmcloud cr region-set ${REGION}
 ibmcloud cr login
 
 set -x
