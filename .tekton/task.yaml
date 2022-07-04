@@ -20,7 +20,7 @@ spec:
       description: the ibmcloud registry namespace
     - name: imageName
       description: the base image name
-      default: "sr-report"
+      default: "st-report"
     - name: registryRegion
       description: the ibmcloud registry region
   workspaces:
