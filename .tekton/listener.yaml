@@ -47,6 +47,7 @@ spec:
                   volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
               spec:
                 accessModes: ["ReadWriteOnce"]
+                storageClassName: ibmc-s3fs-standard-regional
                 resources:
                   requests:
                       storage: 50Mi
