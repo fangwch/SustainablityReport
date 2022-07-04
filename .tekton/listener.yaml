@@ -1,3 +1,23 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ws-pvc
+  namespace: pw-$(uid)
+  annotations:
+    ibm.io/auto-create-bucket: "true"
+    ibm.io/auto-delete-bucket: "true"
+    ibm.io/bucket: ""
+    ibm.io/secret-name: cos-write-access
+    ibm.io/secret-namespace: default
+    volume.beta.kubernetes.io/storage-class: ibmc-s3fs-standard-regional
+    volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+        storage: 100Mi
+  storageClassName: "ibmc-s3fs-standard-regional"
+---
 apiVersion: tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
@@ -35,22 +55,8 @@ spec:
           name: pipeline
         workspaces:
           - name: pipeline-pvc
-            volumeClaimTemplate:
-              metadata:
-                annotations:
-                  ibm.io/auto-create-bucket: "true"
-                  ibm.io/auto-delete-bucket: "true"
-                  ibm.io/bucket: ""
-                  ibm.io/secret-name: cos-write-access
-                  ibm.io/secret-namespace: default
-                  volume.beta.kubernetes.io/storage-class: ibmc-s3fs-standard-regional
-                  volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
-              spec:
-                accessModes: ["ReadWriteOnce"]
-                resources:
-                  requests:
-                      storage: 100Mi
-                StorageClassName: "ibmc-s3fs-standard-regional"
+            persistentVolumeClaim:
+              claimName: ws-pvc
         params:
           - name: repository
             value: $(params.repository)
