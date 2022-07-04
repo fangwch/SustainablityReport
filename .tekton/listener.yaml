@@ -37,7 +37,6 @@ spec:
           - name: pipeline-pvc
             volumeClaimTemplate:
               metadata:
-                name: ws-pvc
                 annotations:
                   ibm.io/auto-create-bucket: "true"
                   ibm.io/auto-delete-bucket: "true"
@@ -51,6 +50,7 @@ spec:
                 resources:
                   requests:
                       storage: 100Mi
+                StorageClassName: "ibmc-s3fs-standard-regional"
         params:
           - name: repository
             value: $(params.repository)
