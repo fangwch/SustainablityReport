@@ -47,7 +47,7 @@ spec:
                   volume.beta.kubernetes.io/storage-class: ibmc-s3fs-standard-regional
                   volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
               spec:
-                storageClassName: ibmc-s3fs-standard-regional
+                storageClassName: local-storage
                 accessModes: ["ReadWriteOnce"]
                 resources:
                   requests:
