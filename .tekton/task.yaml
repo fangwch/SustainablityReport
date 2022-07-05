@@ -92,9 +92,7 @@ spec:
           ibmcloud login -a $API -r $DEFAULT_REGION;
           ibmcloud cr region-set $REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
-          cd /workspace/app;
           export GIT_COMMIT=$(git rev-parse HEAD);
-          cd ..;
           export REGISTRY_URL=$(ibmcloud cr info | grep -m1 -i '^Container Registry' | awk '{print $3;}');
           cd /workspace/app && source scripts/build-docker-image.sh;
   sidecars:
@@ -172,8 +170,7 @@ spec:
           ibmcloud login -a $API -r $DEFAULT_REGION;
           ibmcloud cr region-set $REGION;
           while read line; do export $line; done < /artifacts/build.properties;
-          cp /artifacts/build.properties .;
-          cd /workspace/app && source scripts/check-vulnerabilities.sh || true;
+          cd /workspace/app && (cp /artifacts/build.properties . || true) && (source scripts/check-vulnerabilities.sh || true);
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -192,7 +189,7 @@ spec:
       description: the ibmcloud api endpoint
       default: "https://cloud.ibm.com"
     - name: deployment-file
-      default: deployment/deployment.yml
+      default: deployment/deployment.yaml
     - name: clusterNamespace
       default: prod
     - name: cluster
@@ -236,13 +233,11 @@ spec:
       args:
         - set -e -o pipefail;
           ibmcloud login -a $API -r $REGION;
-          cd /workspace/app;
           export IKS_BETA_VERSION=1;
           ibmcloud ks cluster config -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}";
           if which oc > /dev/null && ibmcloud ks cluster get -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --json | jq -e '.type=="openshift"' > /dev/null; then oc login -u apikey -p "${IBMCLOUD_API_KEY}" ; fi;
           while read line; do export $line; done < /artifacts/build.properties;
-          cp /artifacts/build.properties .;
-          cd /workspace/app && source scripts/pre-deploy-check.sh;
+          cd /workspace/app && (cp /artifacts/build.properties . || true) && source scripts/pre-deploy-check.sh;
     - name: deploy-to-kubernetes
       image: ibmcom/pipeline-base-image
       env:
@@ -268,5 +263,4 @@ spec:
           ibmcloud ks cluster config -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}";
           if which oc > /dev/null && ibmcloud ks cluster get -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --json | jq -e '.type=="openshift"' > /dev/null; then oc login -u apikey -p "${IBMCLOUD_API_KEY}" ; fi;
           while read line; do export $line; done < /artifacts/build.properties;
-          cp /artifacts/build.properties .;
-          cd /workspace/app && source scripts/deploy-to-kubernetes.sh;
+          cd /workspace/app && (cp /artifacts/build.properties . || true) && source scripts/deploy-to-kubernetes.sh;
