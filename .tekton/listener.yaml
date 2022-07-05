@@ -26,6 +26,21 @@ spec:
       description: The Kubernetes cluster namespace
       default: st-report
   resourcetemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: ws-pvc
+        annotations:
+          ibm.io/auto-create-bucket: "true"
+          ibm.io/auto-delete-bucket: "true"
+          ibm.io/bucket: ""
+          ibm.io/secret-name: cos-write-access
+          ibm.io/secret-namespace: default
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+              storage: 50Mi
     - kind: PipelineRun
       apiVersion: tekton.dev/v1beta1
       metadata:
@@ -35,22 +50,8 @@ spec:
           name: pipeline
         workspaces:
           - name: pipeline-pvc
-            volumeClaimTemplate:
-              metadata:
-                annotations:
-                  ibm.io/auto-create-bucket: "true"
-                  ibm.io/auto-delete-bucket: "true"
-                  ibm.io/bucket: ""
-                  ibm.io/secret-name: cos-write-access
-                  ibm.io/secret-namespace: default
-                  volume.beta.kubernetes.io/storage-class: ibmc-s3fs-standard-regional
-                  volume.beta.kubernetes.io/storage-provisioner: ibm.io/ibmc-s3fs
-              spec:
-                accessModes: ["ReadWriteOnce"]
-                storageClassName: ibmc-s3fs-standard-regional
-                resources:
-                  requests:
-                      storage: 50Mi
+            persistentVolumeClaim:
+              claimName: ws-pvc
         params:
           - name: repository
             value: $(params.repository)
