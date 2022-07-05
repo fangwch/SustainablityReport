@@ -7,8 +7,7 @@ metadata:
     app: st-report
 data:
   secrets.toml: |
-    W3Bhc3N3b3Jkc10KIyBGb2xsb3cgdGhlIHJ1bGU6IHVzZXJuYW1lID0gInBhc3N3b3JkIgphZG1p
-    biA9ICJzci1yZXBvcnQtYWRtaW4i
+    W3Bhc3N3b3Jkc10KIyBGb2xsb3cgdGhlIHJ1bGU6IHVzZXJuYW1lID0gInBhc3N3b3JkIgphZG1pbiA9ICJzdC1yZXBvcnQtYWRtaW4i
 type: Opaque
 ---
 kind: Deployment
@@ -61,27 +60,27 @@ spec:
       targetPort: 8501
   selector:
     app: st-report
-  type: ClusterIP
----
-kind: Ingress
-apiVersion: networking.k8s.io/v1
-metadata:
-  name: st-report
-  namespace: st-report
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 2048m
-    nginx.ingress.kubernetes.io/proxy-read-timeout: 3600s
-    nginx.ingress.kubernetes.io/proxy-send-timeout: 3600s
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: report.st.lcovje.top
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: st-report
-                port:
-                  number: 8501
+  type: NodePort
+# ---
+# kind: Ingress
+# apiVersion: networking.k8s.io/v1
+# metadata:
+#   name: st-report
+#   namespace: st-report
+#   annotations:
+#     nginx.ingress.kubernetes.io/proxy-body-size: 2048m
+#     nginx.ingress.kubernetes.io/proxy-read-timeout: 3600s
+#     nginx.ingress.kubernetes.io/proxy-send-timeout: 3600s
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: report.st.lcovje.top
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: st-report
+#                 port:
+#                   number: 8501
