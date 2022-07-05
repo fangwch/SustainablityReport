@@ -39,10 +39,7 @@ spec:
           ports:
             - containerPort: 8501
               protocol: TCP
-          resources:
-            requests:
-              cpu: '1'
-              memory: 512Mi
+          resources: {}
           volumeMounts:
             - name: streamlit-secret
               mountPath: /app/.streamlit
