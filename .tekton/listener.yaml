@@ -64,7 +64,7 @@ spec:
     # - name: repository
     #   value: $(body.repository.clone_url)
     - name: revision
-      value: $(body.commits.id)
+      value: $(body.head_commit.id)
 ---
 apiVersion: tekton.dev/v1beta1
 kind: EventListener
