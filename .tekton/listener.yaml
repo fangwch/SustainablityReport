@@ -26,23 +26,6 @@ spec:
       description: The Kubernetes cluster namespace
       default: st-report
   resourcetemplates:
-    - kind: PersistentVolumeClaim
-      apiVersion: v1
-      metadata:
-        name: ws-pvc
-        annotations:
-          ibm.io/auto-create-bucket: "true"
-          ibm.io/auto-delete-bucket: "true"
-          ibm.io/bucket: ""
-          ibm.io/secret-name: cos-write-access
-          ibm.io/secret-namespace: default
-      spec:
-        storageClassName: ibmc-s3fs-standard-regional
-        accessModes: 
-         - ReadWriteOnce
-        resources:
-          requests:
-              storage: 50Mi
     - kind: PipelineRun
       apiVersion: tekton.dev/v1beta1
       metadata:
