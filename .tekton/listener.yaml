@@ -61,9 +61,7 @@ metadata:
   name: binding
 spec:
   params:
-    # - name: repository
-    #   value: $(body.repository.clone_url)
-    - name: revision
+    - name: commit
       value: $(body.head_commit.id)
 ---
 apiVersion: tekton.dev/v1beta1
