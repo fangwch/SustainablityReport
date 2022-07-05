@@ -38,7 +38,7 @@ spec:
       args:
         - set -e -o pipefail;
           echo "Cloning $REPOSITORY";
-          cd /workspace && rm -rf ./* && git clone -q -b $REVISION $REPOSITORY .;
+          cd /workspace && git clone -q -b $REVISION $REPOSITORY app;
     - name: pre-build-check
       image: ibmcom/pipeline-base-image
       env:
@@ -62,7 +62,7 @@ spec:
           ibmcloud login -a $API -r $DEFAULT_REGION;
           ibmcloud cr region-set $REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
-          cd /workspace && source scripts/pre-build-check.sh;
+          cd /workspace/app && source scripts/pre-build-check.sh;
     - name: build-docker-image
       image: ibmcom/pipeline-base-image
       env:
@@ -92,11 +92,11 @@ spec:
           ibmcloud login -a $API -r $DEFAULT_REGION;
           ibmcloud cr region-set $REGION;
           export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh";
-          cd /workspace;
+          cd /workspace/app;
           export GIT_COMMIT=$(git rev-parse HEAD);
           cd ..;
           export REGISTRY_URL=$(ibmcloud cr info | grep -m1 -i '^Container Registry' | awk '{print $3;}');
-          cd /workspace && source scripts/build-docker-image.sh;
+          cd /workspace/app && source scripts/build-docker-image.sh;
   sidecars:
     - image: moby/buildkit:v0.8.1
       name: server
@@ -152,7 +152,7 @@ spec:
       args:
         - set -e -o pipefail;
           echo "Cloning $REPOSITORY";
-          cd /workspace && rm -rf ./* && git clone -q -b $REVISION $REPOSITORY .;
+          cd /workspace && git clone -q -b $REVISION $REPOSITORY app;
     - name: check-vulnerabilities
       image: ibmcom/pipeline-base-image
       env:
@@ -173,7 +173,7 @@ spec:
           ibmcloud cr region-set $REGION;
           while read line; do export $line; done < /artifacts/build.properties;
           cp /artifacts/build.properties .;
-          cd /workspace && source scripts/check-vulnerabilities.sh || true;
+          cd /workspace/app && source scripts/check-vulnerabilities.sh || true;
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -214,7 +214,7 @@ spec:
       args:
         - set -e -o pipefail;
           echo "Cloning $REPOSITORY";
-          cd /workspace && rm -rf ./* && git clone -q -b $REVISION $REPOSITORY .;
+          cd /workspace && git clone -q -b $REVISION $REPOSITORY app;
     - name: pre-deploy-check
       image: ibmcom/pipeline-base-image
       env:
@@ -236,13 +236,13 @@ spec:
       args:
         - set -e -o pipefail;
           ibmcloud login -a $API -r $REGION;
-          cd /workspace;
+          cd /workspace/app;
           export IKS_BETA_VERSION=1;
           ibmcloud ks cluster config -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}";
           if which oc > /dev/null && ibmcloud ks cluster get -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --json | jq -e '.type=="openshift"' > /dev/null; then oc login -u apikey -p "${IBMCLOUD_API_KEY}" ; fi;
           while read line; do export $line; done < /artifacts/build.properties;
           cp /artifacts/build.properties .;
-          cd /workspace && source scripts/pre-deploy-check.sh;
+          cd /workspace/app && source scripts/pre-deploy-check.sh;
     - name: deploy-to-kubernetes
       image: ibmcom/pipeline-base-image
       env:
@@ -269,4 +269,4 @@ spec:
           if which oc > /dev/null && ibmcloud ks cluster get -c "${PIPELINE_KUBERNETES_CLUSTER_NAME}" --json | jq -e '.type=="openshift"' > /dev/null; then oc login -u apikey -p "${IBMCLOUD_API_KEY}" ; fi;
           while read line; do export $line; done < /artifacts/build.properties;
           cp /artifacts/build.properties .;
-          cd /workspace && source scripts/deploy-to-kubernetes.sh;
+          cd /workspace/app && source scripts/deploy-to-kubernetes.sh;
