@@ -37,7 +37,9 @@ spec:
           ibm.io/secret-name: cos-write-access
           ibm.io/secret-namespace: default
       spec:
-        accessModes: ["ReadWriteOnce"]
+        storageClassName: ibmc-s3fs-standard-regional
+        accessModes: 
+         - ReadWriteOnce
         resources:
           requests:
               storage: 50Mi
