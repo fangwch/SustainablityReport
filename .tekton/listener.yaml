@@ -64,7 +64,8 @@ spec:
     # - name: repository
     #   value: $(body.repository.clone_url)
     - name: revision
-      value: $(body.pull_request.head.sha)
+      # value: $(body.pull_request.head.sha)
+      value: master
 ---
 apiVersion: tekton.dev/v1beta1
 kind: EventListener
