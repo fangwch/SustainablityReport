@@ -1,19 +1,18 @@
-# -*- coding:utf-8 -*-
+# coding=utf-8
 
+import time
+from dotenv import load_dotenv
 import streamlit as st
 from streamlit.script_run_context import get_script_run_ctx
-from streamlit.uploaded_file_manager import UploadedFile
-import pandas as pd
 import pydeck as pdk
 import altair as alt
-import time
+
+load_dotenv(override=True)
+
+NOW = str(time.time_ns())
 
 ctx = get_script_run_ctx()
 if ctx is not None:
-  NOW = str(time.time_ns())
-  MODES = ['Road', 'Rail','Sea', 'Air']
-  CO2E = dict(zip(['Air' ,'Sea', 'Road', 'Rail'], [2.1, 0.01, 0.096, 0.028]))
-
   st.set_page_config(
     page_title='Sustainablity Report',
     page_icon=':earth:',
@@ -21,114 +20,37 @@ if ctx is not None:
     initial_sidebar_state='auto'
   )
 
-  # Initialize
-  if 'exec_mode' not in st.session_state:
-    exec_mode = False
-  else:
-    exec_mode = st.session_state['exec_mode']
-  if 'preview_mode' not in st.session_state:
-    preview_mode = False
-  else:
-    preview_mode = st.session_state['preview_mode']
-  for key in ['order_line', 'uom_conversion', 'gps_location', 'distance']:
-    if key not in st.session_state:
-      st.session_state[key] = None
+  from lib.utils import save_in_session_state
+  from lib.data import clear_data, get_line_level_data, add_distribute_mode
+  from lib.auth import login, verify, get_token
 
-  order_line = st.session_state['order_line']
-  uom_conversion = st.session_state['uom_conversion']
-  gps_location = st.session_state['gps_location']
-  distance = st.session_state['distance']
-
-  def save_in_session_state(*_, **kwargs):
-    label = kwargs['label']
-    key = kwargs['key']
-    if isinstance(st.session_state[key], (UploadedFile, )):
-      st.session_state[label] = pd.read_csv(st.session_state[key], header=0, index_col=0)
-      st.session_state[label].name = st.session_state[key].name
-    else:
-      st.session_state[label] = st.session_state[key]
-
-  def clear_all_file():
-    for key in ['order_line', 'uom_conversion', 'gps_location', 'distance']:
-      if key in st.session_state:
-        del st.session_state[key]
-    if 'exec_mode' in st.session_state:
-      del st.session_state['exec_mode']
-
-  @st.cache
-  def get_line_level_data(order_line, uom_conversion, gps_location, distance):
-    # Read all file
-    order_line = order_line.copy()
-    uom_conversion = uom_conversion.copy()
-    gps_location = gps_location.copy()
-    distance = distance.copy()
-    # # Analysis
-    # Step 1
-    df_join = pd.merge(order_line, uom_conversion, on=['Item Code'], how='left', suffixes=('', '_y'))
-    df_join.drop(df_join.filter(regex='_y$').columns.tolist(),axis=1, inplace=True)
-    # Step 2
-    distance['Location'] = distance['Customer Country'].astype(str) + ', ' + distance['Customer City'].astype(str)
-    df_dist = pd.merge(distance, gps_location, on='Location', how='left', suffixes=('', '_y'))
-    df_dist.drop(df_dist.filter(regex='_y$').columns.tolist(),axis=1, inplace=True)
-    # Step 3
-    df_join = pd.merge(df_join, df_dist, on = ['Warehouse Code', 'Customer Code'], how='left', suffixes=('', '_y'))
-    df_join.drop(df_join.filter(regex='_y$').columns.tolist(),axis=1, inplace=True)
-    # Step 4
-    df_join['KG'] = df_join['Units'] * df_join['Conversion Ratio']
-    for mode in MODES:
-      df_join['CO2 ' + mode] = df_join['KG'].astype(float)/1000 * df_join[mode].astype(float) * CO2E[mode]
-    df_join['CO2 Total'] = df_join[['CO2 ' + mode for mode in MODES]].sum(axis = 1)
-    return df_join
-
-  def add_distribute_mode(data):
-    data = data.copy()
-    data['Delivery Mode'] = data[MODES].astype(
-      float
-    ).apply(lambda t: [mode if t[mode] > 0 else '-' for mode in MODES], axis=1)
-    dict_map = dict(
-      zip(
-        data['Delivery Mode'].astype(str).unique(), [
-          i.replace(", '-'", '').replace("'-'", '').replace("'", '')
-          for i in data['Delivery Mode'].astype(str).unique()
-        ]
-      )
+  if not verify(get_token()):
+    st.text_input('Username', on_change=None, key='username')
+    st.text_input(
+      'Password', type='password', on_change=None, key='password'
     )
-    data['Delivery Mode'] = data['Delivery Mode'].astype(
-      str
-    ).map(dict_map)
-    return data
-
-  def check_password():
-
-    def password_entered():
-      if (
-        'username' in st.session_state and st.session_state['username'] in st.secrets['passwords']
-        and st.session_state['password']
-        == st.secrets['passwords'][st.session_state['username']]
-      ):
-        st.session_state['password_correct'] = True
-        del st.session_state['password']  # don't store username + password
-        del st.session_state['username']
-      else:
-        st.session_state['password_correct'] = False
-
-    if 'password_correct' not in st.session_state:
-      st.text_input('Username', on_change=password_entered, key='username')
-      st.text_input(
-        'Password', type='password', on_change=password_entered, key='password'
-      )
-      return False
-    elif not st.session_state['password_correct']:
-      st.text_input('Username', on_change=password_entered, key='username')
-      st.text_input(
-        'Password', type='password', on_change=password_entered, key='password'
-      )
-      st.error('😕 User not known or password incorrect')
-      return False
+    st.button(label='Sign In', on_click=login)
+    if 'access_token' in st.session_state:
+      st.error('😕 User not known or password incorrect or session expired')
+  else:
+    # Initialize
+    if 'exec_mode' not in st.session_state:
+      exec_mode = False
     else:
-      return True
+      exec_mode = st.session_state['exec_mode']
+    if 'preview_mode' not in st.session_state:
+      preview_mode = False
+    else:
+      preview_mode = st.session_state['preview_mode']
+    for key in ['order_line', 'uom_conversion', 'gps_location', 'distance']:
+      if key not in st.session_state:
+        st.session_state[key] = None
 
-  if check_password():
+    order_line = st.session_state['order_line']
+    uom_conversion = st.session_state['uom_conversion']
+    gps_location = st.session_state['gps_location']
+    distance = st.session_state['distance']
+
     if not exec_mode:
       # File Uploader
       with st.sidebar.container():
@@ -179,7 +101,7 @@ if ctx is not None:
       # Preview and Execute Button
       with st.sidebar.container():
         left, middle, right = st.columns([1, 1, 1])
-        middle.button('Reset', key='reset', on_click=clear_all_file)
+        middle.button('Reset', key='reset', on_click=clear_data)
         if order_line is None or uom_conversion is None or gps_location is None or distance is None:
           left.button('Preview', key='preview_mode', disabled=True)
           right.button('Execute', key='exec_mode_' + NOW, disabled=True)
@@ -312,4 +234,4 @@ if ctx is not None:
           ]
         )
         st.altair_chart(chart, use_container_width=True)
-      left.button('Home', key='homepage', on_click=clear_all_file)
+      left.button('Home', key='homepage', on_click=clear_data)

@@ -10,6 +10,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('app.py', '.'),
+        ('lib', './lib'),
         (
             ".pyvenv/Lib/site-packages/altair/vegalite/v4/schema/vega-lite-schema.json",
             "./altair/vegalite/v4/schema/"
